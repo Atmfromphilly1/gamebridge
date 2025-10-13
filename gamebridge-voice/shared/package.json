@@ -1,0 +1,14 @@
+{
+  "name": "@gamebridge/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for GameBridge Voice",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

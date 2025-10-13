@@ -1,0 +1,30 @@
+{
+  "name": "gamebridge-voice",
+  "version": "1.0.0",
+  "description": "Cross-platform gaming voice chat app for Xbox and PlayStation players",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile",
+    "desktop",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:mobile\" \"npm run dev:desktop\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:mobile": "cd mobile && npm run start",
+    "dev:desktop": "cd desktop && npm run dev",
+    "build": "npm run build:backend && npm run build:mobile && npm run build:desktop",
+    "build:backend": "cd backend && npm run build",
+    "build:mobile": "cd mobile && npm run build",
+    "build:desktop": "cd desktop && npm run build",
+    "install:all": "npm install && npm run install:backend && npm run install:mobile && npm run install:desktop",
+    "install:backend": "cd backend && npm install",
+    "install:mobile": "cd mobile && npm install",
+    "install:desktop": "cd desktop && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}

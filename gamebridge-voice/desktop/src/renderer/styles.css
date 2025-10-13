@@ -1,0 +1,386 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid #333;
+  backdrop-filter: blur(10px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-left h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00d4ff;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+}
+
+.status-indicator.connected {
+  background: #4CAF50;
+}
+
+.status-indicator.disconnected {
+  background: #F44336;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.btn-logout {
+  background: #F44336;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-logout:hover {
+  background: #d32f2f;
+}
+
+.app-main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+.login-card {
+  background: rgba(51, 51, 51, 0.9);
+  padding: 40px;
+  border-radius: 16px;
+  width: 400px;
+  backdrop-filter: blur(10px);
+  border: 1px solid #444;
+}
+
+.login-card h1 {
+  text-align: center;
+  margin-bottom: 8px;
+  color: #00d4ff;
+  font-size: 28px;
+}
+
+.login-card p {
+  text-align: center;
+  color: #ccc;
+  margin-bottom: 32px;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00d4ff;
+}
+
+.btn-primary {
+  width: 100%;
+  background: #00d4ff;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #00b8e6;
+}
+
+.btn-secondary {
+  width: 100%;
+  background: transparent;
+  color: #ccc;
+  border: 1px solid #444;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #333;
+  border-color: #555;
+}
+
+.lobby-selection {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.lobby-selection h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.lobby-selection p {
+  font-size: 18px;
+  color: #ccc;
+  margin-bottom: 40px;
+}
+
+.lobby-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.lobby-actions .btn-primary,
+.lobby-actions .btn-secondary {
+  width: 200px;
+  padding: 16px 24px;
+  font-size: 16px;
+}
+
+.lobby-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.lobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: rgba(51, 51, 51, 0.5);
+  border-radius: 12px;
+  border: 1px solid #444;
+}
+
+.lobby-header h2 {
+  font-size: 24px;
+  color: #fff;
+}
+
+.lobby-code {
+  font-family: monospace;
+  font-size: 16px;
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.btn-danger {
+  background: #F44336;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-danger:hover {
+  background: #d32f2f;
+}
+
+.participants-section {
+  margin-bottom: 32px;
+}
+
+.participants-section h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.participants-list {
+  display: grid;
+  gap: 12px;
+}
+
+.participant-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: rgba(51, 51, 51, 0.5);
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.participant-emoji {
+  font-size: 24px;
+}
+
+.participant-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.participant-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.host-badge {
+  background: #00d4ff;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.participant-status {
+  font-size: 12px;
+  color: #4CAF50;
+}
+
+.participant-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.muted-indicator,
+.deafened-indicator {
+  font-size: 16px;
+}
+
+.voice-controls {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(51, 51, 51, 0.5);
+  border-radius: 12px;
+  border: 1px solid #444;
+}
+
+.voice-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #333;
+  color: #fff;
+  border: 2px solid #444;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.voice-btn:hover {
+  background: #444;
+  border-color: #555;
+}
+
+.voice-btn.active {
+  background: #F44336;
+  border-color: #F44336;
+}
+
+.voice-btn.active:hover {
+  background: #d32f2f;
+  border-color: #d32f2f;
+}
