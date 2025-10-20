@@ -4,8 +4,8 @@ import { io, Socket } from 'socket.io-client';
 import { GamingPlatform, User, Lobby, LobbyParticipant } from '@gamebridge/shared';
 import './styles.css';
 
-const API_BASE_URL = 'http://localhost:3000/api';
-const SOCKET_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://45-55-247-235.nip.io/api';
+const SOCKET_URL = 'https://45-55-247-235.nip.io';
 
 interface AppState {
   user: User | null;
@@ -33,6 +33,8 @@ function App() {
   });
 
   const [showLogin, setShowLogin] = useState(true);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateDownloaded, setUpdateDownloaded] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [registerForm, setRegisterForm] = useState({ 
     username: '', 
@@ -65,6 +67,8 @@ function App() {
         // Implement push-to-talk logic
         console.log('Push to talk activated');
       });
+      window.electronAPI.onUpdateAvailable?.(() => setUpdateAvailable(true));
+      window.electronAPI.onUpdateDownloaded?.(() => setUpdateDownloaded(true));
     }
   }, []);
 
@@ -226,6 +230,12 @@ function App() {
   if (showLogin) {
     return (
       <div className="login-container">
+        {updateAvailable && (
+          <div className="update-banner">An update is available. Downloading…</div>
+        )}
+        {updateDownloaded && (
+          <div className="update-banner success">Update ready. Restart the app to install.</div>
+        )}
         <div className="login-card">
           <h1>GameBridge Voice</h1>
           <p>Connect gamers across Xbox and PlayStation platforms</p>
@@ -361,7 +371,10 @@ function App() {
           <div className="lobby-container">
             <div className="lobby-header">
               <h2>{state.currentLobby.name}</h2>
-              <div className="lobby-code">Code: {state.currentLobby.lobbyCode}</div>
+              {/* lobbyCode may be present when coming from socket events */}
+              {((state.currentLobby as unknown) as { lobbyCode?: string })?.lobbyCode && (
+                <div className="lobby-code">Code: {((state.currentLobby as unknown) as { lobbyCode?: string }).lobbyCode}</div>
+              )}
               <button className="btn-danger" onClick={leaveLobby}>
                 Leave Lobby
               </button>

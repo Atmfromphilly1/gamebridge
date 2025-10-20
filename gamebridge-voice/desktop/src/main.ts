@@ -1,8 +1,10 @@
 import { app, BrowserWindow, Menu, Tray, nativeImage, globalShortcut } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
+let isQuitting = false;
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -16,7 +18,7 @@ function createWindow(): void {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      enableRemoteModule: false,
+      webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
     },
     icon: path.join(__dirname, '../assets/icon.png'),
@@ -29,7 +31,8 @@ function createWindow(): void {
     mainWindow.loadURL('http://localhost:8080');
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'renderer/index.html'));
+    // In production, both main.js and index.html are emitted into the same dist folder
+    mainWindow.loadFile(path.join(__dirname, 'index.html'));
   }
 
   // Show window when ready
@@ -43,14 +46,17 @@ function createWindow(): void {
   });
 
   // Handle minimize to tray
-  mainWindow.on('minimize', (event) => {
+  mainWindow.on('minimize', (event: Electron.Event) => {
     event.preventDefault();
     mainWindow?.hide();
   });
 
   // Handle close to tray
-  mainWindow.on('close', (event) => {
-    if (!app.isQuiting) {
+  app.on('before-quit', () => {
+    isQuitting = true;
+  });
+  mainWindow.on('close', (event: Electron.Event) => {
+    if (!isQuitting) {
       event.preventDefault();
       mainWindow?.hide();
     }
@@ -89,7 +95,7 @@ function createTray(): void {
     {
       label: 'Quit',
       click: () => {
-        app.isQuiting = true;
+        isQuitting = true;
         app.quit();
       }
     }
@@ -128,7 +134,7 @@ function createMenu(): void {
           label: 'Quit',
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
           click: () => {
-            app.isQuiting = true;
+            isQuitting = true;
             app.quit();
           }
         }
@@ -209,6 +215,17 @@ app.whenReady().then(() => {
   createMenu();
   registerGlobalShortcuts();
 
+  // Auto-updates
+  autoUpdater.autoDownload = true;
+  autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+
+  autoUpdater.on('update-available', () => {
+    mainWindow?.webContents.send('update-available');
+  });
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow?.webContents.send('update-downloaded');
+  });
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -227,8 +244,8 @@ app.on('will-quit', () => {
 });
 
 // Security: Prevent new window creation
-app.on('web-contents-created', (event, contents) => {
-  contents.on('new-window', (event, navigationUrl) => {
-    event.preventDefault();
+app.on('web-contents-created', (_event, contents) => {
+  contents.setWindowOpenHandler(() => {
+    return { action: 'deny' };
   });
 });

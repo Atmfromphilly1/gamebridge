@@ -46,6 +46,9 @@ export async function initializeDatabase() {
 
 async function createTables() {
   const createTablesQuery = `
+    -- Ensure required extensions are available
+    CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
     -- Users table
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

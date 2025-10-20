@@ -85,7 +85,7 @@ export default function RegisterScreen({ navigation }: any) {
 
   return (
     <LinearGradient
-      colors={['#1a1a1a', '#2a2a2a', '#1a1a1a']}
+      colors={['#0b1216', '#121a21', '#0b1216']}
       style={styles.container}
     >
       <KeyboardAvoidingView

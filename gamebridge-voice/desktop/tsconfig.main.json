@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*"],
+  "include": ["src/main.ts", "src/preload.ts"],
   "exclude": ["node_modules", "dist"]
 }

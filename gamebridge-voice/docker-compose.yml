@@ -21,8 +21,8 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -42,9 +42,7 @@ services:
     depends_on:
       - postgres
       - redis
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    # In production, do not override the container filesystem
 
 volumes:
   postgres_data:

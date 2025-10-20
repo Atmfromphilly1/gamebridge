@@ -20,7 +20,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      '@gamebridge/shared': path.resolve(__dirname, '../shared/src'),
+      '@gamebridge/shared': path.resolve(__dirname, '../shared/dist'),
     },
   },
   output: {

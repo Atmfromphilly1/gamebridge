@@ -98,11 +98,15 @@ app.use('*', (req, res) => {
   });
 });
 
-// Initialize database and start server
+// Initialize database (optional) and start server
 async function startServer() {
   try {
-    await initializeDatabase();
-    console.log('✅ Database connected successfully');
+    if (process.env.USE_IN_MEMORY === 'true') {
+      console.log('⚠️  USE_IN_MEMORY enabled: skipping external DB/Redis connections');
+    } else {
+      await initializeDatabase();
+      console.log('✅ Database connected successfully');
+    }
     
     server.listen(PORT, () => {
       console.log(`🚀 GameBridge Voice server running on port ${PORT}`);

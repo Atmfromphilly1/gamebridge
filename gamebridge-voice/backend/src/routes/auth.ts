@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import { db } from '../database/connection';
-import { GamingPlatform, validateUsername, validateEmail, validatePassword } from '@gamebridge/shared';
+import { GamingPlatform, validateUsername, validateEmail, validatePassword } from '../types';
 
 const router = Router();
 

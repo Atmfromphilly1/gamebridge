@@ -144,7 +144,8 @@ export default function LobbyScreen({ route, navigation }: any) {
   }
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#2a2a2a']} style={styles.container}>
+    <LinearGradient colors={['#0b1216', '#121a21']} style={styles.container}>
+    <LinearGradient colors={['#0b1216', '#121a21']} style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}

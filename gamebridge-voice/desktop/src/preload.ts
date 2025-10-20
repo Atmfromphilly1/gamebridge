@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from 'electron';
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -17,5 +17,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   onJoinLobby: (callback: () => void) => {
     ipcRenderer.on('join-lobby', callback);
+  },
+  onUpdateAvailable: (callback: () => void) => {
+    ipcRenderer.on('update-available', callback);
+  },
+  onUpdateDownloaded: (callback: () => void) => {
+    ipcRenderer.on('update-downloaded', callback);
   },
 });

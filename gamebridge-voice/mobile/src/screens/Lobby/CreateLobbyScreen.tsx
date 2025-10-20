@@ -68,7 +68,7 @@ export default function CreateLobbyScreen({ navigation }: any) {
 
   return (
     <LinearGradient
-      colors={['#1a1a1a', '#2a2a2a']}
+      colors={['#0b1216', '#121a21']}
       style={styles.container}
     >
       <View style={styles.content}>
