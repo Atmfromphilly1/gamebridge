@@ -4,8 +4,8 @@ import { io, Socket } from 'socket.io-client';
 import { GamingPlatform, User, Lobby, LobbyParticipant } from '@gamebridge/shared';
 import './styles.css';
 
-const API_BASE_URL = 'https://45-55-247-235.nip.io/api';
-const SOCKET_URL = 'https://45-55-247-235.nip.io';
+const API_BASE_URL = 'https://gamebridge-root-cbki4.ondigitalocean.app/api';
+const SOCKET_URL = 'https://gamebridge-root-cbki4.ondigitalocean.app';
 
 interface AppState {
   user: User | null;
@@ -73,17 +73,26 @@ function App() {
   }, []);
 
   const initializeSocket = (token: string) => {
+    console.log('Initializing socket with token:', token);
+    console.log('Socket URL:', SOCKET_URL);
+    
     const socket = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket'],
     });
 
     socket.on('connect', () => {
+      console.log('Socket connected successfully');
       setState(prev => ({ ...prev, socket, isConnected: true }));
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
       setState(prev => ({ ...prev, isConnected: false }));
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
     });
 
     socket.on('lobby:joined', (lobby: Lobby) => {
