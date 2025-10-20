@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node src/simple-server.js",
+    "start": "node dist/server.js",
     "db:migrate": "node dist/database/migrate.js",
     "db:seed": "node dist/database/seed.js"
   },
