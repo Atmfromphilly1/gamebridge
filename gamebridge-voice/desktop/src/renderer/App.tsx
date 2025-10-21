@@ -4,8 +4,8 @@ import { io, Socket } from 'socket.io-client';
 import { GamingPlatform, User, Lobby, LobbyParticipant } from '@gamebridge/shared';
 import './styles.css';
 
-const API_BASE_URL = 'https://gamebridge-root-cbki4.ondigitalocean.app/api';
-const SOCKET_URL = 'https://gamebridge-root-cbki4.ondigitalocean.app';
+const API_BASE_URL = 'http://localhost:3000/api';
+const SOCKET_URL = 'http://localhost:3000';
 
 interface AppState {
   user: User | null;
@@ -20,6 +20,8 @@ interface AppState {
 }
 
 function App() {
+  console.log('GameBridge Voice App starting...');
+  
   const [state, setState] = useState<AppState>({
     user: null,
     token: null,
@@ -42,6 +44,11 @@ function App() {
     password: '', 
     platform: GamingPlatform.PC 
   });
+  const [showLobbyModal, setShowLobbyModal] = useState(false);
+  const [lobbyInput, setLobbyInput] = useState('');
+  const [lobbyModalType, setLobbyModalType] = useState<'create' | 'join'>('create');
+  const [chatMessages, setChatMessages] = useState<Array<{id: string, userId: string, username: string, content: string, timestamp: Date}>>([]);
+  const [chatInput, setChatInput] = useState('');
 
   useEffect(() => {
     // Load stored auth data
@@ -59,8 +66,8 @@ function App() {
       initializeSocket(storedToken);
     }
 
-    // Listen for Electron events
-    if (window.electronAPI) {
+    // Listen for Electron events (only in Electron environment)
+    if (typeof window !== 'undefined' && window.electronAPI) {
       window.electronAPI.onToggleMute(() => toggleMute());
       window.electronAPI.onToggleDeafen(() => toggleDeafen());
       window.electronAPI.onPushToTalk(() => {
@@ -95,7 +102,13 @@ function App() {
       console.error('Socket connection error:', error);
     });
 
+    socket.on('lobby:created', (lobby: Lobby) => {
+      console.log('Lobby created:', lobby);
+      setState(prev => ({ ...prev, currentLobby: lobby, participants: lobby.participants }));
+    });
+
     socket.on('lobby:joined', (lobby: Lobby) => {
+      console.log('Lobby joined:', lobby);
       setState(prev => ({ ...prev, currentLobby: lobby, participants: lobby.participants }));
     });
 
@@ -129,6 +142,11 @@ function App() {
           p.userId === data.userId ? { ...p, isDeafened: data.isDeafened } : p
         )
       }));
+    });
+
+    socket.on('chat:message', (data: { userId: string; username: string; content: string; timestamp: Date }) => {
+      console.log('Chat message received:', data);
+      setChatMessages(prev => [...prev, { ...data, id: Date.now().toString() }]);
     });
   };
 
@@ -196,16 +214,26 @@ function App() {
   };
 
   const createLobby = () => {
-    const lobbyName = prompt('Enter lobby name:');
-    if (lobbyName) {
-      state.socket?.emit('lobby:create', { name: lobbyName });
-    }
+    setLobbyModalType('create');
+    setLobbyInput('');
+    setShowLobbyModal(true);
   };
 
   const joinLobby = () => {
-    const lobbyCode = prompt('Enter lobby code:');
-    if (lobbyCode) {
-      state.socket?.emit('lobby:join', { lobbyCode });
+    setLobbyModalType('join');
+    setLobbyInput('');
+    setShowLobbyModal(true);
+  };
+
+  const handleLobbySubmit = () => {
+    if (lobbyInput.trim()) {
+      if (lobbyModalType === 'create') {
+        state.socket?.emit('lobby:create', { name: lobbyInput.trim() });
+      } else {
+        state.socket?.emit('lobby:join', { lobbyCode: lobbyInput.trim() });
+      }
+      setShowLobbyModal(false);
+      setLobbyInput('');
     }
   };
 
@@ -224,6 +252,16 @@ function App() {
     const newDeafenedState = !state.isDeafened;
     setState(prev => ({ ...prev, isDeafened: newDeafenedState }));
     state.socket?.emit('voice:deafen_toggle', { isDeafened: newDeafenedState });
+  };
+
+  const sendMessage = () => {
+    if (chatInput.trim() && state.currentLobby) {
+      state.socket?.emit('chat:message', {
+        lobbyId: state.currentLobby.id,
+        content: chatInput.trim()
+      });
+      setChatInput('');
+    }
   };
 
   const getPlatformEmoji = (platform: GamingPlatform) => {
@@ -415,23 +453,80 @@ function App() {
               </div>
             </div>
 
-            <div className="voice-controls">
-              <button 
-                className={`voice-btn ${state.isMuted ? 'active' : ''}`}
-                onClick={toggleMute}
-              >
-                {state.isMuted ? '🔇' : '🎤'} {state.isMuted ? 'Unmute' : 'Mute'}
-              </button>
-              <button 
-                className={`voice-btn ${state.isDeafened ? 'active' : ''}`}
-                onClick={toggleDeafen}
-              >
-                {state.isDeafened ? '🔇' : '🔊'} {state.isDeafened ? 'Undeafen' : 'Deafen'}
-              </button>
+            <div className="lobby-content">
+              <div className="chat-section">
+                <h3>Chat</h3>
+                <div className="chat-messages">
+                  {chatMessages.map((message) => (
+                    <div key={message.id} className="chat-message">
+                      <span className="message-username">{message.username}:</span>
+                      <span className="message-content">{message.content}</span>
+                      <span className="message-time">
+                        {new Date(message.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="chat-input">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Type a message..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  />
+                  <button className="btn-primary" onClick={sendMessage}>
+                    Send
+                  </button>
+                </div>
+              </div>
+
+              <div className="voice-controls">
+                <button 
+                  className={`voice-btn ${state.isMuted ? 'active' : ''}`}
+                  onClick={toggleMute}
+                >
+                  {state.isMuted ? '🔇' : '🎤'} {state.isMuted ? 'Unmute' : 'Mute'}
+                </button>
+                <button 
+                  className={`voice-btn ${state.isDeafened ? 'active' : ''}`}
+                  onClick={toggleDeafen}
+                >
+                  {state.isDeafened ? '🔇' : '🔊'} {state.isDeafened ? 'Undeafen' : 'Deafen'}
+                </button>
+              </div>
             </div>
           </div>
         )}
       </main>
+
+      {/* Lobby Modal */}
+      {showLobbyModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>{lobbyModalType === 'create' ? 'Create New Lobby' : 'Join Lobby'}</h3>
+            <div className="form-group">
+              <label>{lobbyModalType === 'create' ? 'Lobby Name' : 'Lobby Code'}</label>
+              <input
+                type="text"
+                value={lobbyInput}
+                onChange={(e) => setLobbyInput(e.target.value)}
+                placeholder={lobbyModalType === 'create' ? 'Enter lobby name' : 'Enter lobby code'}
+                onKeyPress={(e) => e.key === 'Enter' && handleLobbySubmit()}
+                autoFocus
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="btn-primary" onClick={handleLobbySubmit}>
+                {lobbyModalType === 'create' ? 'Create' : 'Join'}
+              </button>
+              <button className="btn-secondary" onClick={() => setShowLobbyModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

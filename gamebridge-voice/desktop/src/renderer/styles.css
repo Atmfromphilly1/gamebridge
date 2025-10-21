@@ -345,10 +345,95 @@ body {
   font-size: 16px;
 }
 
+.lobby-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.chat-section {
+  background: rgba(51, 51, 51, 0.5);
+  border-radius: 12px;
+  border: 1px solid #444;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+
+.chat-section h3 {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.chat-message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.message-username {
+  font-weight: bold;
+  color: #4CAF50;
+  margin-right: 8px;
+  min-width: 80px;
+}
+
+.message-content {
+  color: #fff;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.message-time {
+  color: #888;
+  font-size: 12px;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.chat-input input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.chat-input button {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
 .voice-controls {
   display: flex;
-  gap: 16px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  align-self: start;
   padding: 20px;
   background: rgba(51, 51, 51, 0.5);
   border-radius: 12px;
@@ -383,4 +468,48 @@ body {
 .voice-btn.active:hover {
   background: #d32f2f;
   border-color: #d32f2f;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: rgba(51, 51, 51, 0.95);
+  padding: 32px;
+  border-radius: 16px;
+  width: 400px;
+  backdrop-filter: blur(10px);
+  border: 1px solid #444;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #00d4ff;
+  font-size: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions .btn-primary,
+.modal-actions .btn-secondary {
+  flex: 1;
+  margin-bottom: 0;
 }

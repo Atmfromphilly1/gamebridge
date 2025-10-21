@@ -186,12 +186,15 @@ io.on('connection', (socket) => {
   // Handle chat messages
   socket.on('chat:message', (data) => {
     console.log('Chat message:', data);
-    socket.to(`lobby:${data.lobbyId}`).emit('chat:message', {
+    const messageData = {
       userId: socket.userId,
       username: socket.username,
       content: data.content,
       timestamp: new Date()
-    });
+    };
+    
+    // Broadcast to all users in the lobby (including sender)
+    io.to(`lobby:${data.lobbyId}`).emit('chat:message', messageData);
   });
   
   // Handle disconnect
