@@ -69,6 +69,15 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
+// Lobby endpoints
+app.get('/api/lobby/list', (req, res) => {
+  // Return empty array for now - lobbies are created via socket.io
+  res.json({
+    success: true,
+    data: []
+  });
+});
+
 // Socket.io middleware for authentication
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
@@ -93,22 +102,28 @@ io.on('connection', (socket) => {
   socket.on('lobby:create', async (data) => {
     console.log('Creating lobby:', data);
     
+    const lobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const lobby = {
       id: `lobby-${Date.now()}`,
       name: data.name || 'Test Lobby',
       maxParticipants: data.maxParticipants || 8,
       isPrivate: data.isPrivate || false,
-      code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+      lobbyCode: lobbyCode,
+      code: lobbyCode, // Keep both for compatibility
       participants: [{
         userId: socket.userId,
         username: socket.username,
+        platform: 'pc', // Default platform
         isMuted: false,
         isDeafened: false,
-        joinedAt: new Date()
-      }]
+        joinedAt: new Date(),
+        isHost: true
+      }],
+      createdAt: new Date()
     };
     
     socket.join(`lobby:${lobby.id}`);
+    console.log('Emitting lobby:created with:', lobby);
     socket.emit('lobby:created', lobby);
   });
   
@@ -194,7 +209,8 @@ io.on('connection', (socket) => {
     };
     
     // Broadcast to all users in the lobby (including sender)
-    io.to(`lobby:${data.lobbyId}`).emit('chat:message', messageData);
+    // Use chat:message_received to match what the app listens for
+    io.to(`lobby:${data.lobbyId}`).emit('chat:message_received', messageData);
   });
   
   // Handle disconnect
@@ -203,8 +219,9 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 GameBridge Voice server running on port ${PORT}`);
   console.log(`📡 Socket.io server ready for connections`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`📍 Server accessible at http://0.0.0.0:${PORT}`);
 });
