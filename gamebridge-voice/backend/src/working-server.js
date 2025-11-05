@@ -4,17 +4,33 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+// Load environment variables
 dotenv.config();
+
+// Log environment info
+console.log('🚀 Starting GameBridge Voice Server...');
+console.log('📦 Node version:', process.version);
+console.log('🌍 NODE_ENV:', process.env.NODE_ENV || 'not set');
+console.log('🔌 PORT:', process.env.PORT || '3000 (default)');
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ['GET', 'POST'],
-    credentials: false
-  }
-});
+
+// Initialize Socket.IO with error handling
+let io;
+try {
+  io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ['GET', 'POST'],
+      credentials: false
+    }
+  });
+  console.log('✅ Socket.IO initialized');
+} catch (error) {
+  console.error('❌ Socket.IO initialization failed:', error);
+  process.exit(1);
+}
 
 const PORT = process.env.PORT || 3000;
 
@@ -219,9 +235,31 @@ io.on('connection', (socket) => {
   });
 });
 
+// Error handling for server startup
+server.on('error', (error) => {
+  console.error('❌ Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`⚠️  Port ${PORT} is already in use`);
+  }
+  process.exit(1);
+});
+
+// Start server
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 GameBridge Voice server running on port ${PORT}`);
+  console.log(`✅ GameBridge Voice server running on port ${PORT}`);
   console.log(`📡 Socket.io server ready for connections`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📍 Server accessible at http://0.0.0.0:${PORT}`);
+  console.log(`💚 Health check available at http://0.0.0.0:${PORT}/health`);
+});
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
